@@ -45,14 +45,17 @@ const questions = [
 ];
 
 /********************************
- * 3. HITUNG SCORE MAKS
+ * 3. HITUNG SCORE MAKS (AMAN)
  ********************************/
 const maxScore = {SIKAP:0, SKILL:0, PENAMPILAN:0};
-questions.forEach(q => maxScore[q.category] += q.score.YA);
-}
+questions.forEach(q => {
+  if (maxScore[q.category] !== undefined) {
+    maxScore[q.category] += q.score.YA;
+  }
 });
+
 /********************************
- * 4. STATE
+ * 4. STATE GLOBAL
  ********************************/
 let currentIndex = 0;
 let answers = [];
@@ -104,8 +107,8 @@ function start() {
   nikUser = document.getElementById("nik").value;
   cabangUser = document.getElementById("cabang").value;
 
-  if (!namaUser || !nikUser) {
-    alert("Nama , NIK & Cabang wajib diisi");
+  if (!namaUser || !nikUser || !cabangUser) {
+    alert("Nama, NIK, dan Cabang wajib diisi");
     return;
   }
 
@@ -133,7 +136,7 @@ function showQuestion() {
  ********************************/
 function answer(val) {
   const q = questions[currentIndex];
-  answers.push({category:q.category, score:q.score[val]});
+  answers.push({ category: q.category, score: q.score[val] });
 
   currentIndex++;
   if (currentIndex < questions.length) {
@@ -151,14 +154,14 @@ function showResult() {
   answers.forEach(a => total[a.category] += a.score);
 
   const percent = {
-    SIKAP: Math.round(total.SIKAP / maxScore.SIKAP * 100),
-    SKILL: Math.round(total.SKILL / maxScore.SKILL * 100),
-    PENAMPILAN: Math.round(total.PENAMPILAN / maxScore.PENAMPILAN * 100)
+    SIKAP: Math.round((total.SIKAP / maxScore.SIKAP) * 100),
+    SKILL: Math.round((total.SKILL / maxScore.SKILL) * 100),
+    PENAMPILAN: Math.round((total.PENAMPILAN / maxScore.PENAMPILAN) * 100)
   };
 
   const result = Math.round((percent.SIKAP + percent.SKILL + percent.PENAMPILAN) / 3);
 
-  // SIMPAN KE DATABASE LOCAL
+  // SIMPAN
   const data = JSON.parse(localStorage.getItem("bsqaData") || "[]");
   data.push({
     nama: namaUser,
@@ -206,14 +209,21 @@ function showAdminDashboard() {
 
   document.getElementById("app").innerHTML = `
     <h2>Dashboard Super Admin</h2>
+
     <button onclick="downloadAll()">Download Semua Excel</button>
     <button onclick="logout()">Logout</button>
 
     <table>
       <tr>
-        <th>No</th><th>Nama</th><th>NIK</th>
-        <th>Sikap</th><th>Skill</th>
-        <th>Penampilan</th><th>Result</th><th>Tanggal</th>
+        <th>No</th>
+        <th>Nama</th>
+        <th>NIK</th>
+        <th>Cabang</th>
+        <th>Sikap</th>
+        <th>Skill</th>
+        <th>Penampilan</th>
+        <th>Result</th>
+        <th>Tanggal</th>
       </tr>
       ${rows}
     </table>
@@ -221,26 +231,23 @@ function showAdminDashboard() {
 }
 
 /********************************
- * 12. DOWNLOAD EXCEL USER
+ * 12. DOWNLOAD USER EXCEL
  ********************************/
 function downloadUserExcel(result) {
   let csv = "Nama,NIK,Cabang,Sikap,Skill,Penampilan,Result\n";
   csv += `${namaUser},${nikUser},${cabangUser},${sum("SIKAP")},${sum("SKILL")},${sum("PENAMPILAN")},${result}%`;
-
   downloadCSV(csv, "hasil_bsqa_user.csv");
 }
 
 /********************************
- * 13. DOWNLOAD EXCEL ADMIN
+ * 13. DOWNLOAD ADMIN EXCEL
  ********************************/
 function downloadAll() {
   const data = JSON.parse(localStorage.getItem("bsqaData") || "[]");
-  let csv = "Nama,NIK,Sikap,Skill,Penampilan,Result,Tanggal\n";
-
+  let csv = "Nama,NIK,Cabang,Sikap,Skill,Penampilan,Result,Tanggal\n";
   data.forEach(d=>{
-    csv += `${d.nama},${d.nik},${d.sikap},${d.skill},${d.penampilan},${d.result}%,${d.tanggal}\n`;
+    csv += `${d.nama},${d.nik},${d.cabang},${d.sikap},${d.skill},${d.penampilan},${d.result}%,${d.tanggal}\n`;
   });
-
   downloadCSV(csv, "rekap_bsqa_admin.csv");
 }
 
