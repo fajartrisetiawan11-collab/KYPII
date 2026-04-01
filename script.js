@@ -36,7 +36,7 @@ const questions = [
   { text:"Apakah Satpam bau badan/mulut ?", category:"PENAMPILAN", score:{YA:9,TIDAK:0,NA:0} },
   { text:"Seragam rapi & bersih", category:"PENAMPILAN", score:{YA:11,TIDAK:0,NA:0} },
   { text:"Apakah Satpam mengenakan kopel berwarna hitam ?", category:"PENAMPILAN", score:{YA:7,TIDAK:0,NA:0} },
-  { text:"Apakah Satpam mengenakan tali kur & peluit ?", score:{YA:7,TIDAK:0,NA:0} },
+  { text:"Apakah Satpam mengenakan tali kur & peluit ?", category:"PENAMPILAN",score:{YA:7,TIDAK:0,NA:0} },
   { text:"Apakah Satpam mengenakan tongkat/pentungan?", category:"PENAMPILAN", score:{YA:11,TIDAK:0,NA:0} },
   { text:"Apakah Satpam mengenakan badge Polda ?", category:"PENAMPILAN", score:{YA:9,TIDAK:0,NA:0} },
   { text:"Apakah Satpam mengenakan borgol? (tidak diisi dengan barang lain)", category:"PENAMPILAN", score:{YA:9,TIDAK:0,NA:0} },
@@ -49,7 +49,8 @@ const questions = [
  ********************************/
 const maxScore = {SIKAP:0, SKILL:0, PENAMPILAN:0};
 questions.forEach(q => maxScore[q.category] += q.score.YA);
-
+}
+});
 /********************************
  * 4. STATE
  ********************************/
@@ -57,6 +58,7 @@ let currentIndex = 0;
 let answers = [];
 let namaUser = "";
 let nikUser = "";
+let cabangUser = "";
 
 /********************************
  * 5. LOGIN
@@ -100,9 +102,10 @@ function showMenu() {
 function start() {
   namaUser = document.getElementById("nama").value;
   nikUser = document.getElementById("nik").value;
+  cabangUser = document.getElementById("cabang").value;
 
   if (!namaUser || !nikUser) {
-    alert("Nama & NIK wajib diisi");
+    alert("Nama , NIK & Cabang wajib diisi");
     return;
   }
 
