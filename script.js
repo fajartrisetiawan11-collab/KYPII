@@ -1,43 +1,36 @@
 /********************************
- * 1. KODE AKSES (LOGIN)
+ * 1. USER & ROLE
  ********************************/
-const validCodes = [
-  "BSQA-ADMIN-001",
-  "BSQA-USER-001",
-  "BSQA-USER-002"
+const users = [
+  { code: "BSQA-ADMIN-001", role: "ADMIN" },
+  { code: "BSQA-USER-001", role: "USER" },
+  { code: "BSQA-USER-002", role: "USER" }
 ];
+
+let currentRole = "";
 
 /********************************
  * 2. DATA QUESTIONNAIRE
  ********************************/
 const questions = [
-  // ===== SIKAP =====
-  { QID:"Q1", text:"Apakah Satpam ada di area dalam banking hall ?", category:"SIKAP", score:{YA:7,TIDAK:0,NA:0} },
-  { QID:"Q2a", text:"Membukakan pintu banking hall ?", category:"SIKAP", score:{YA:9,TIDAK:0,NA:0} },
-  { QID:"Q2b", text:"Mengucapkan salam ?", category:"SIKAP", score:{YA:7,TIDAK:0,NA:0} },
-  { QID:"Q2c", text:"Menawarkan bantuan ?", category:"SIKAP", score:{YA:5,TIDAK:0,NA:0} },
-  { QID:"Q2d", text:"Suara Satpam terdengar jelas", category:"SIKAP", score:{YA:7,TIDAK:0,NA:0} },
-  { QID:"Q3", text:"Memberikan kartu antrian", category:"SIKAP", score:{YA:9,TIDAK:0,NA:0} },
+  { text:"Apakah Satpam ada di area banking hall?", category:"SIKAP", score:{YA:7,TIDAK:0,NA:0} },
+  { text:"Membukakan pintu banking hall?", category:"SIKAP", score:{YA:9,TIDAK:0,NA:0} },
+  { text:"Mengucapkan salam?", category:"SIKAP", score:{YA:7,TIDAK:0,NA:0} },
 
-  // ===== SKILL =====
-  { QID:"Qskill1", text:"Mengetahui biaya transaksi Teller/ATM", category:"SKILL", score:{YA:41,TIDAK:0,NA:0} },
+  { text:"Mengetahui biaya transaksi Teller/ATM?", category:"SKILL", score:{YA:41,TIDAK:0,NA:0} },
 
-  // ===== PENAMPILAN =====
-  { QID:"QP1a", text:"Rambut Satpam rapi", category:"PENAMPILAN", score:{YA:9,TIDAK:0,NA:0} },
-  { QID:"QP1b", text:"Tidak bau badan/mulut", category:"PENAMPILAN", score:{YA:9,TIDAK:0,NA:0} },
-  { QID:"QP2a", text:"Seragam rapi dan bersih", category:"PENAMPILAN", score:{YA:11,TIDAK:0,NA:0} }
+  { text:"Rambut Satpam rapi", category:"PENAMPILAN", score:{YA:9,TIDAK:0,NA:0} },
+  { text:"Seragam rapi & bersih", category:"PENAMPILAN", score:{YA:11,TIDAK:0,NA:0} }
 ];
 
 /********************************
- * 3. HITUNG SKOR MAKSIMUM
+ * 3. HITUNG SCORE MAKS
  ********************************/
-const maxScore = { SIKAP:0, SKILL:0, PENAMPILAN:0 };
-questions.forEach(q => {
-  maxScore[q.category] += q.score.YA;
-});
+const maxScore = {SIKAP:0, SKILL:0, PENAMPILAN:0};
+questions.forEach(q => maxScore[q.category] += q.score.YA);
 
 /********************************
- * 4. STATE GLOBAL
+ * 4. STATE
  ********************************/
 let currentIndex = 0;
 let answers = [];
@@ -49,22 +42,31 @@ let nikUser = "";
  ********************************/
 function login() {
   const code = document.getElementById("accessCode").value.trim();
-  if (!validCodes.includes(code)) {
-    alert("Kode akses tidak valid");
+  const user = users.find(u => u.code === code);
+
+  if (!user) {
+    alert("Kode akses salah");
     return;
   }
-  showMenu();
+
+  currentRole = user.role;
+
+  if (currentRole === "ADMIN") {
+    showAdminDashboard();
+  } else {
+    showMenu();
+  }
 }
 
 /********************************
- * 6. MENU + INPUT USER
+ * 6. MENU USER
  ********************************/
 function showMenu() {
   document.getElementById("app").innerHTML = `
     <h2>Data Penilai</h2>
-    <input id="nama" placeholder="Nama Lengkap"><br><br>
-    <input id="nik" placeholder="NIK"><br><br>
-
+    <input id="nama" placeholder="Nama Lengkap">
+    <input id="nik" placeholder="NIK">
+    <br>
     <button onclick="start()">Mulai Kuesioner</button>
     <button onclick="logout()">Logout</button>
   `;
@@ -78,7 +80,7 @@ function start() {
   nikUser = document.getElementById("nik").value;
 
   if (!namaUser || !nikUser) {
-    alert("Nama dan NIK wajib diisi");
+    alert("Nama & NIK wajib diisi");
     return;
   }
 
@@ -88,14 +90,13 @@ function start() {
 }
 
 /********************************
- * 8. TAMPILKAN PERTANYAAN
+ * 8. SHOW QUESTION
  ********************************/
 function showQuestion() {
   const q = questions[currentIndex];
   document.getElementById("app").innerHTML = `
     <h3>${q.category}</h3>
     <p>${q.text}</p>
-
     <button onclick="answer('YA')">YA</button>
     <button onclick="answer('TIDAK')">TIDAK</button>
     <button onclick="answer('NA')">N/A</button>
@@ -103,20 +104,13 @@ function showQuestion() {
 }
 
 /********************************
- * 9. SIMPAN JAWABAN
+ * 9. SAVE ANSWER
  ********************************/
 function answer(val) {
   const q = questions[currentIndex];
-
-  answers.push({
-    QID: q.QID,
-    category: q.category,
-    answer: val,
-    score: q.score[val]
-  });
+  answers.push({category:q.category, score:q.score[val]});
 
   currentIndex++;
-
   if (currentIndex < questions.length) {
     showQuestion();
   } else {
@@ -125,73 +119,122 @@ function answer(val) {
 }
 
 /********************************
- * 10. TAMPILKAN HASIL + PERSENTASE
+ * 10. RESULT USER
  ********************************/
 function showResult() {
-  const total = { SIKAP:0, SKILL:0, PENAMPILAN:0 };
-
+  const total = {SIKAP:0, SKILL:0, PENAMPILAN:0};
   answers.forEach(a => total[a.category] += a.score);
 
   const percent = {
-    SIKAP: Math.round((total.SIKAP / maxScore.SIKAP) * 100),
-    SKILL: Math.round((total.SKILL / maxScore.SKILL) * 100),
-    PENAMPILAN: Math.round((total.PENAMPILAN / maxScore.PENAMPILAN) * 100)
+    SIKAP: Math.round(total.SIKAP / maxScore.SIKAP * 100),
+    SKILL: Math.round(total.SKILL / maxScore.SKILL * 100),
+    PENAMPILAN: Math.round(total.PENAMPILAN / maxScore.PENAMPILAN * 100)
   };
 
-  const resultAkhir = Math.round(
-    (percent.SIKAP + percent.SKILL + percent.PENAMPILAN) / 3
-  );
+  const result = Math.round((percent.SIKAP + percent.SKILL + percent.PENAMPILAN) / 3);
+
+  // SIMPAN KE DATABASE LOCAL
+  const data = JSON.parse(localStorage.getItem("bsqaData") || "[]");
+  data.push({
+    nama: namaUser,
+    nik: nikUser,
+    sikap: total.SIKAP,
+    skill: total.SKILL,
+    penampilan: total.PENAMPILAN,
+    result: result,
+    tanggal: new Date().toLocaleString()
+  });
+  localStorage.setItem("bsqaData", JSON.stringify(data));
 
   document.getElementById("app").innerHTML = `
     <h2>HASIL PENILAIAN</h2>
-
     <p>Sikap: ${total.SIKAP} (${percent.SIKAP}%)</p>
     <p>Skill: ${total.SKILL} (${percent.SKILL}%)</p>
     <p>Penampilan: ${total.PENAMPILAN} (${percent.PENAMPILAN}%)</p>
+    <h3>RESULT AKHIR: ${result}%</h3>
 
-    <h3>RESULT AKHIR: ${resultAkhir}%</h3>
-
-    <button onclick="downloadExcel(${resultAkhir})">Download Excel</button>
+    <button onclick="downloadUserExcel(${result})">Download Excel</button>
     <button onclick="showMenu()">Kembali</button>
   `;
 }
 
 /********************************
- * 11. DOWNLOAD EXCEL (CSV)
+ * 11. ADMIN DASHBOARD
  ********************************/
-function downloadExcel(resultAkhir) {
-  const total = {
-    SIKAP: sum("SIKAP"),
-    SKILL: sum("SKILL"),
-    PENAMPILAN: sum("PENAMPILAN")
-  };
+function showAdminDashboard() {
+  const data = JSON.parse(localStorage.getItem("bsqaData") || "[]");
 
-  let csv = "Nama,NIK,Total Sikap,Total Skill,Total Penampilan,Result (%)\n";
-  csv += `${namaUser},${nikUser},${total.SIKAP},${total.SKILL},${total.PENAMPILAN},${resultAkhir}%`;
+  let rows = data.map((d,i)=>`
+    <tr>
+      <td>${i+1}</td>
+      <td>${d.nama}</td>
+      <td>${d.nik}</td>
+      <td>${d.sikap}</td>
+      <td>${d.skill}</td>
+      <td>${d.penampilan}</td>
+      <td>${d.result}%</td>
+      <td>${d.tanggal}</td>
+    </tr>
+  `).join("");
 
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-  const url = URL.createObjectURL(blob);
+  document.getElementById("app").innerHTML = `
+    <h2>Dashboard Super Admin</h2>
+    <button onclick="downloadAll()">Download Semua Excel</button>
+    <button onclick="logout()">Logout</button>
 
+    <table>
+      <tr>
+        <th>No</th><th>Nama</th><th>NIK</th>
+        <th>Sikap</th><th>Skill</th>
+        <th>Penampilan</th><th>Result</th><th>Tanggal</th>
+      </tr>
+      ${rows}
+    </table>
+  `;
+}
+
+/********************************
+ * 12. DOWNLOAD EXCEL USER
+ ********************************/
+function downloadUserExcel(result) {
+  let csv = "Nama,NIK,Sikap,Skill,Penampilan,Result\n";
+  csv += `${namaUser},${nikUser},${sum("SIKAP")},${sum("SKILL")},${sum("PENAMPILAN")},${result}%`;
+
+  downloadCSV(csv, "hasil_bsqa_user.csv");
+}
+
+/********************************
+ * 13. DOWNLOAD EXCEL ADMIN
+ ********************************/
+function downloadAll() {
+  const data = JSON.parse(localStorage.getItem("bsqaData") || "[]");
+  let csv = "Nama,NIK,Sikap,Skill,Penampilan,Result,Tanggal\n";
+
+  data.forEach(d=>{
+    csv += `${d.nama},${d.nik},${d.sikap},${d.skill},${d.penampilan},${d.result}%,${d.tanggal}\n`;
+  });
+
+  downloadCSV(csv, "rekap_bsqa_admin.csv");
+}
+
+/********************************
+ * 14. UTIL
+ ********************************/
+function sum(cat){
+  return answers.filter(a=>a.category===cat).reduce((s,a)=>s+a.score,0);
+}
+
+function downloadCSV(content, filename){
+  const blob = new Blob([content], {type:"text/csv"});
   const a = document.createElement("a");
-  a.href = url;
-  a.download = "hasil_penilaian_bsqa.csv";
-  document.body.appendChild(a);
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
   a.click();
-  document.body.removeChild(a);
 }
 
 /********************************
- * 12. HELPER
+ * 15. LOGOUT
  ********************************/
-function sum(cat) {
-  return answers
-    .filter(a => a.category === cat)
-    .reduce((s, a) => s + a.score, 0);
-}
-
-/********************************
- * 13. LOGOUT
- ********************************/
-function logout() {
+function logout(){
   location.reload();
 }
