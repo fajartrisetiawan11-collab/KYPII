@@ -16,11 +16,32 @@ const questions = [
   { text:"Apakah Satpam ada di area banking hall?", category:"SIKAP", score:{YA:7,TIDAK:0,NA:0} },
   { text:"Membukakan pintu banking hall?", category:"SIKAP", score:{YA:9,TIDAK:0,NA:0} },
   { text:"Mengucapkan salam?", category:"SIKAP", score:{YA:7,TIDAK:0,NA:0} },
+  { text:"Menawarkan bantuan ?",category:"SIKAP", score:{YA:5,TIDAK:0,NA:0} },
+  { text:"Suara Satpam terdengar dengan jelas",category:"SIKAP", score:{YA:7,TIDAK:0,NA:0} },
+  { text:"Sikap Satpam tidak grogi/ fokus dan ramah",category:"SIKAP", score:{YA:7,TIDAK:0,NA:0} },
+  { text:"Jika nasabah akan ke Teller/CR Satpam memberikan kartu antrian lalu mempersilahkan duduk di kursi tunggu",category:"SIKAP", score:{YA:9,TIDAK:0,NA:0} },
+  { text:"Jika Satpam tidak ada di area pintu banking hall, apakah Satpam sedang membantu nasabah/siaga di writing desk/berkeliling/mengawasi area banking hall?",category:"SIKAP", score:{YA:9,TIDAK:0,NA:0} },
+  { text:"Apakah Satpam sempat melakukan hal-hal yang non produktif, termasuk namun tidak terbatas pada:Satpam hanya berdiri di dekat pintu/menggunakan HP/mengobrol dengan sesama anggota Satpam lainnya namun bukan seputar pekerjaan ? ",category:"SIKAP", score:{YA:7,TIDAK:0,NA:0} },
+  { text:"Satpam konsisten berada di dalam banking hall dan melakukan hal yang produktif selama jam layanan",category:"SIKAP", score:{YA:7,TIDAK:0,NA:0} },
+  { text:"Membukakan pintu banking hall ?",category:"SIKAP", score:{YA:9,TIDAK:0,NA:0} },
+  { text:"Mengucapkan terima kasih atas kunjungan nasabah ?",category:"SIKAP", score:{YA:7,TIDAK:0,NA:0} },
+  { text:"Mengucapkan salam ?",category:"SIKAP", score:{YA:5,TIDAK:0,NA:0} },
+  { text:"Suara Satpam terdengar dengan jelas",category:"SIKAP", score:{YA:9,TIDAK:0,NA:0} },
+  { text:"Mengisi Logbook Tamu",category:"SIKAP", score:{YA:7,TIDAK:0,NA:0} },
+  { text:"Jika Satpam tidak ada di area pintu banking hall, apakah Satpam sedang membantu nasabah/siaga di writing desk/berkeliling mengawasi area banking hall ? ",category:"SIKAP", score:{YA:7,TIDAK:0,NA:0} },
 
   { text:"Mengetahui biaya transaksi Teller/ATM?", category:"SKILL", score:{YA:41,TIDAK:0,NA:0} },
 
   { text:"Rambut Satpam rapi", category:"PENAMPILAN", score:{YA:9,TIDAK:0,NA:0} },
-  { text:"Seragam rapi & bersih", category:"PENAMPILAN", score:{YA:11,TIDAK:0,NA:0} }
+  { text:"Apakah Satpam bau badan/mulut ?", category:"PENAMPILAN", score:{YA:9,TIDAK:0,NA:0} },
+  { text:"Seragam rapi & bersih", category:"PENAMPILAN", score:{YA:11,TIDAK:0,NA:0} },
+  { text:"Apakah Satpam mengenakan kopel berwarna hitam ?", category:"PENAMPILAN", score:{YA:7,TIDAK:0,NA:0} },
+  { text:"Apakah Satpam mengenakan tali kur & peluit ?", score:{YA:7,TIDAK:0,NA:0} },
+  { text:"Apakah Satpam mengenakan tongkat/pentungan?", category:"PENAMPILAN", score:{YA:11,TIDAK:0,NA:0} },
+  { text:"Apakah Satpam mengenakan badge Polda ?", category:"PENAMPILAN", score:{YA:9,TIDAK:0,NA:0} },
+  { text:"Apakah Satpam mengenakan borgol? (tidak diisi dengan barang lain)", category:"PENAMPILAN", score:{YA:9,TIDAK:0,NA:0} },
+  { text:"Apakah Satpam mengenakan nametag BTPNS ?", category:"PENAMPILAN", score:{YA:9,TIDAK:0,NA:0} },
+  { text:"Apakah Satpam mengenakan nama dada ?", category:"PENAMPILAN", score:{YA:9,TIDAK:0,NA:0} }
 ];
 
 /********************************
@@ -66,6 +87,7 @@ function showMenu() {
     <h2>Data Penilai</h2>
     <input id="nama" placeholder="Nama Lengkap">
     <input id="nik" placeholder="NIK">
+    <input id="cabang" placeholder="Nama Cabang">
     <br>
     <button onclick="start()">Mulai Kuesioner</button>
     <button onclick="logout()">Logout</button>
@@ -138,6 +160,7 @@ function showResult() {
   data.push({
     nama: namaUser,
     nik: nikUser,
+    cabang: cabangUser,
     sikap: total.SIKAP,
     skill: total.SKILL,
     penampilan: total.PENAMPILAN,
@@ -169,6 +192,7 @@ function showAdminDashboard() {
       <td>${i+1}</td>
       <td>${d.nama}</td>
       <td>${d.nik}</td>
+      <td>${d.cabang}</td>
       <td>${d.sikap}</td>
       <td>${d.skill}</td>
       <td>${d.penampilan}</td>
@@ -197,8 +221,8 @@ function showAdminDashboard() {
  * 12. DOWNLOAD EXCEL USER
  ********************************/
 function downloadUserExcel(result) {
-  let csv = "Nama,NIK,Sikap,Skill,Penampilan,Result\n";
-  csv += `${namaUser},${nikUser},${sum("SIKAP")},${sum("SKILL")},${sum("PENAMPILAN")},${result}%`;
+  let csv = "Nama,NIK,Cabang,Sikap,Skill,Penampilan,Result\n";
+  csv += `${namaUser},${nikUser},${cabangUser},${sum("SIKAP")},${sum("SKILL")},${sum("PENAMPILAN")},${result}%`;
 
   downloadCSV(csv, "hasil_bsqa_user.csv");
 }
