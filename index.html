@@ -2,18 +2,83 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>BSQA - Assessment</title>
+  <title>BSQA Assessment</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #fff4e6;
+    }
+
+    .container {
+      width: 700px;
+      margin: 40px auto;
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      text-align: center;
+    }
+
+    h2, h3 {
+      color: #ff7a00;
+    }
+
+    input {
+      width: 80%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background: #ff7a00;
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      margin: 6px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    button:hover {
+      background: #e66a00;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th {
+      background: #ff7a00;
+      color: white;
+    }
+
+    td, th {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+    }
+  </style>
 </head>
+
 <body>
 
-  <h2>Masukkan Kode Akses</h2>
+  <div class="container">
+    <h2>Login BSQA</h2>
 
-  <input type="text" id="accessCode" placeholder="Kode Akses" />
-  <button onclick="login()">Masuk</button>
+    <input type="text" id="accessCode" placeholder="Kode Akses">
+    <br>
+    <button onclick="login()">Masuk</button>
 
-  <hr>
+    <hr>
 
-  <div id="app"></div>
+    <div id="app"></div>
+  </div>
 
   <script src="script.js"></script>
 </body>
